@@ -76,3 +76,16 @@ sudo ip netns exec $NS1 ping -W 1 -c 2 172.16.0.2
 #ping the bridge
 sudo ip netns exec $NS1 ping -W 1 -c 2 172.16.0.1
 
+#----------Tunnel----------
+# this should run on both nodes 
+echo "start the UDP tunnel in the background"
+sudo socat UDP:$TO_NODE_IP:9000,BIND=$NODE_IP:9000 TUN:$TUNNEL_IP/16,tun-name=tundudp,iff-no-pi,tun-type=tun &
+
+#Check routes in containe1
+sudo ip  netns exec $NS1 ip rout 
+
+#Examine what route the route to reach one of the container on ubuntu2
+ip route get $TO_IP1
+
+#Ping a container  hosted on Ubuntu2 from a container hosted on this server 
+sudo ip netns exec $NS1 ping -c 4 $TO_IP1
